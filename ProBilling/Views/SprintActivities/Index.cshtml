@@ -1,0 +1,83 @@
+﻿@model IEnumerable<ProBilling.Models.SprintActivity>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.AvailableHours)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.BackupHours)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompanyMeetingHours)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OnsiteHours)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OvertimeHours)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.HolidayOvertimeHours)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Remarks)
+                </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sprint)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AvailableHours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BackupHours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CompanyMeetingHours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OnsiteHours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OvertimeHours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HolidayOvertimeHours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Remarks)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sprint.SprintId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Id)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ActivityId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ActivityId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ActivityId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

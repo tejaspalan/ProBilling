@@ -1,0 +1,74 @@
+﻿@model ProBilling.Models.SprintActivity
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>SprintActivity</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ActivityId" />
+            <div class="form-group">
+                <label asp-for="SprintId" class="control-label"></label>
+                <select asp-for="SprintId" class="form-control" asp-items="ViewBag.SprintId"></select>
+                <span asp-validation-for="SprintId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserId" class="control-label"></label>
+                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AvailableHours" class="control-label"></label>
+                <input asp-for="AvailableHours" class="form-control" />
+                <span asp-validation-for="AvailableHours" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BackupHours" class="control-label"></label>
+                <input asp-for="BackupHours" class="form-control" />
+                <span asp-validation-for="BackupHours" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CompanyMeetingHours" class="control-label"></label>
+                <input asp-for="CompanyMeetingHours" class="form-control" />
+                <span asp-validation-for="CompanyMeetingHours" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OnsiteHours" class="control-label"></label>
+                <input asp-for="OnsiteHours" class="form-control" />
+                <span asp-validation-for="OnsiteHours" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OvertimeHours" class="control-label"></label>
+                <input asp-for="OvertimeHours" class="form-control" />
+                <span asp-validation-for="OvertimeHours" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HolidayOvertimeHours" class="control-label"></label>
+                <input asp-for="HolidayOvertimeHours" class="form-control" />
+                <span asp-validation-for="HolidayOvertimeHours" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Remarks" class="control-label"></label>
+                <input asp-for="Remarks" class="form-control" />
+                <span asp-validation-for="Remarks" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

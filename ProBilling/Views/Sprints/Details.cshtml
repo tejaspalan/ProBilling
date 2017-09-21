@@ -1,0 +1,42 @@
+﻿@model ProBilling.Models.Sprint
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Sprint</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.SprintNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SprintNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SprintStart)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SprintStart)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SprintEnd)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SprintEnd)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Team)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Team.TeamId)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.SprintId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

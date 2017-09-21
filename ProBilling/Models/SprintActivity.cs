@@ -11,7 +11,7 @@ namespace ProBilling.Models
         public long ActivityId { get; set; }
         public int SprintId { get; set; }
         public Sprint Sprint { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public ApplicationUser User { get; set; }
         public double AvailableHours { get; set; }
         public double BackupHours { get; set; }

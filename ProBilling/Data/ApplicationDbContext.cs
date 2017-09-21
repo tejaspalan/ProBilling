@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProBilling.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace ProBilling.Data
 {
@@ -15,6 +16,10 @@ namespace ProBilling.Data
         {
         }
 
+        protected ApplicationDbContext()
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -22,7 +27,10 @@ namespace ProBilling.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
             builder.Entity<ApplicationUser>()
-                .HasKey(user => user.UserId);
+                .HasKey(user => user.Id);
+
+            builder.Entity<ApplicationUser>()
+                .HasAlternateKey(user => user.UserName);
 
             builder.Entity<Team>()
                 .HasKey(team => team.TeamId);
@@ -67,5 +75,11 @@ namespace ProBilling.Data
                 .WithMany(team => team.TeamUserMapping)
                 .HasForeignKey(teamUserMapping => teamUserMapping.TeamId);
         }
+
+        public DbSet<ProBilling.Models.Team> Team { get; set; }
+
+        public DbSet<ProBilling.Models.Sprint> Sprint { get; set; }
+
+        public DbSet<ProBilling.Models.SprintActivity> SprintActivity { get; set; }
     }
 }
