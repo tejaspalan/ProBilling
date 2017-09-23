@@ -13,6 +13,8 @@ using ProBilling.Models;
 using ProBilling.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using ProBilling.Authentication;
+using ProBilling.Authentication.Handlers;
 
 namespace ProBilling
 {
@@ -38,13 +40,26 @@ namespace ProBilling
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 
+            services.AddTransient<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
+
             services.AddMvc(config =>
             {
-                var policy = new AuthorizationPolicyBuilder()
+                var requireAuthenticatedUserPolicy = new AuthorizationPolicyBuilder()
                                  .RequireAuthenticatedUser()
                                  .Build();
-                config.Filters.Add(new AuthorizeFilter(policy));
+                config.Filters.Add(new AuthorizeFilter(requireAuthenticatedUserPolicy));
             });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(PolicyConstants.AdminOnlyPolicy,
+                                  policy => policy.Requirements.Add(new UserDesignationRequirement(new List<DesignationEnum>() {DesignationEnum.Admin })));
+
+                options.AddPolicy(PolicyConstants.AdminSmCdlPolicy,
+                                  policy => policy.Requirements.Add(new UserDesignationRequirement(new List<DesignationEnum>() { DesignationEnum.Admin, DesignationEnum.CDL, DesignationEnum.ScrumMaster })));
+            });
+
+            services.AddSingleton<IAuthorizationHandler, DesignationHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

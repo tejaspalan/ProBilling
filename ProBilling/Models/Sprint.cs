@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProBilling.Models
 {
-    public class Sprint
+    public class Sprint : IProBillingEntity
     {
         public int SprintId { get; set; }
         public int SprintNumber { get; set; }
@@ -17,5 +17,7 @@ namespace ProBilling.Models
         public int TeamId { get; set; }
         public Team Team { get; set; }
         public List<SprintActivity> SprintActivities { get; set; }
+        public bool IsSprintCompletedSuccessfully { get; set; }
+        public string CustomerRemarks { get; set; }
     }
 }

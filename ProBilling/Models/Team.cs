@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ProBilling.Models
 {
-    public class Team
+    public class Team : IProBillingEntity
     {
         public int TeamId { get; set; }
         public string TeamName { get; set; }
