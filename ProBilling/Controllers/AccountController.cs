@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using ProBilling.Models;
 using ProBilling.Models.AccountViewModels;
 using ProBilling.Services;
+using ProBilling.Authentication;
 
 namespace ProBilling.Controllers
 {
@@ -205,7 +206,7 @@ namespace ProBilling.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize(PolicyConstants.AdminOnlyPolicy)]
         public IActionResult Register(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -213,8 +214,8 @@ namespace ProBilling.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [Authorize(PolicyConstants.AdminOnlyPolicy)]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
