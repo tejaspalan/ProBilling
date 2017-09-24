@@ -26,7 +26,7 @@ namespace ProBilling.Models.AccountViewModels
 
         [Required]
         [Display(Name = "Designation")]
-        public String Designation { get; set; }
+        public int Designation { get; set; }
 
 	    [Required]
 		public string Name { get; set; }

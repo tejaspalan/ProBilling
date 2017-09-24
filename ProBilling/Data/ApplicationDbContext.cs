@@ -82,6 +82,6 @@ namespace ProBilling.Data
 
         public DbSet<ProBilling.Models.SprintActivity> SprintActivity { get; set; }
 
-	    public DbSet<ProBilling.Models.TeamUserMapping> TeamUserMapping { get; set; }
-	}
+        public DbSet<ProBilling.Models.TeamUserMapping> TeamUserMapping { get; set; }
+    }
 }
