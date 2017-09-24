@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Mvc.Rendering
-@model ScrumMasterViewModel
+﻿@model ScrumMasterViewModel
 <div class="row">
 	<div class="col-md-8">
 		<section>
@@ -15,7 +14,7 @@
 				<div class="col-md-12" id="teamTable">
 				</div>
 				<div class="form-group">
-					<a asp-action="" class="btn btn-default">View previous sprint </a> | <a asp-action="" class="btn btn-default">View current sprint</a> | <a asp-action="" class="btn btn-default">Create new sprint</a>
+					<a asp-action="ViewPreviousSprints" class="btn btn-default">View previous sprint </a> | <a asp-action="ViewCurrentSprint" class="btn btn-default">View current sprint</a> | <a asp-action="" class="btn btn-default">Create new sprint</a>
 				</div>
 			</form>
 		</section>

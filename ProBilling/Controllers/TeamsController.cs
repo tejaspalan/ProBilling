@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using ProBilling.Class;
 using ProBilling.Data;
 using ProBilling.Models;
 
@@ -145,7 +146,48 @@ namespace ProBilling.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TeamExists(int id)
+		public async Task<IActionResult> AddUserToTeam()
+		{
+			var listOfTeams = await _context.Team.ToListAsync();
+
+			var teams = new List<SelectListItem>();
+			teams.Add(new SelectListItem
+			{
+				Text = "Select",
+				Value = ""
+			});
+
+			foreach (Team team in listOfTeams)
+			{
+				teams.Add(new SelectListItem { Text = team.TeamName, Value = team.TeamId.ToString()});
+			}
+
+			ViewBag.Teams = teams;
+			
+			return View();
+		}
+
+	    public async Task<IActionResult> GetUserForTeam(int teamId)
+	    {
+		    var user = await _context.TeamUserMapping.Include(item => item.User).Where(item => item.TeamId == teamId).ToListAsync();
+		    List<TeamTableViewModel> teamTableViewModels = new List<TeamTableViewModel>();
+		  //  foreach (ApplicationUser appUser in user)
+		  //  {
+			 //   TeamTableViewModel teamTableViewModel = new TeamTableViewModel
+			 //   {
+				//	UserName = appUser.Name,
+				//	Designation = appUser.Designation,
+				//	Email = appUser.Email
+			 //   };
+
+				//teamTableViewModels.Add(teamTableViewModel);
+
+		  //  }
+		    return PartialView("TeamTable", teamTableViewModels);
+
+		}
+
+		private bool TeamExists(int id)
         {
             return _context.Team.Any(e => e.TeamId == id);
         }

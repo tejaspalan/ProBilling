@@ -1,0 +1,33 @@
+﻿@model IEnumerable<TeamTableViewModel>
+<table class="table table-condensed table-striped table-responsive">
+	<thead>
+		<tr data-item-id="">
+			<th>
+				@Html.DisplayNameFor(model => model.UserName)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Designation)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Email)
+			</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		@foreach (TeamTableViewModel item in Model)
+		{
+			<tr data-item-id="">
+				<td>
+					@Html.DisplayFor(model => item.UserName)
+				</td>
+				<td>
+					@Html.DisplayFor(model => item.Designation)
+				</td>
+				<td>
+					@Html.DisplayFor(model => item.Email)
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>

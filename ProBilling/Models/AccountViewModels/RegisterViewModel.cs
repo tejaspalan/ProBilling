@@ -28,6 +28,9 @@ namespace ProBilling.Models.AccountViewModels
         [Display(Name = "Designation")]
         public String Designation { get; set; }
 
+	    [Required]
+		public string Name { get; set; }
+
         [Display(Name = "Is Billable?")]
         public bool IsBillable { get; set; }
     }

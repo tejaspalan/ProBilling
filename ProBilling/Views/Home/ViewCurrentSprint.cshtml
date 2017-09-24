@@ -1,0 +1,33 @@
+﻿@model CurrentSprintViewModel
+<div class="row">
+	<div class="col-md-12">
+		<section>
+			<form asp-controller="" asp-action="" asp-route-returnurl="" method="post" class="form-horizontal">
+				<h4>View current sprint</h4>
+				<hr />
+				<div class="form-group">
+					<label asp-for="Team" class=" col-md-1 control-label"></label>
+					<div class="col-md-6">
+						<select id="selectTeam" class="form-control" asp-for="Team" asp-items="ViewBag.Teams"></select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label asp-for="SprintDates" class=" col-md-1 control-label"></label>
+					<div class="col-md-6">
+						<select id="selectSprintDate" class="form-control" asp-for="SprintDates" asp-items="ViewBag.Sprints"></select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<div class="col-md-6">
+						<button type="button" id="viewCurrentReport" class="btn btn-default">View Report</button>
+					</div>
+				</div>
+
+				<div class="col-md-12" id="currentSprintReport">
+				</div>
+			</form>
+		</section>
+	</div>
+</div>

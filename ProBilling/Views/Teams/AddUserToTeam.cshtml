@@ -1,0 +1,27 @@
+﻿@model Team
+
+<div class="row">
+	<div class="col-md-8">
+		<section>
+			<form asp-controller="" asp-action="" asp-route-returnurl="" method="post" class="form-horizontal">
+				<h4>Add user to team</h4>
+				<hr />
+				<div class="form-group">
+					<label asp-for="TeamName" class=" col-md-2 control-label"></label>
+					<div class="col-md-6">
+						<select id="teamUser" class="form-control" asp-for="TeamName" asp-items="ViewBag.Teams"></select>
+					</div>
+				</div>
+				<div class="form-group" id="addNewUser" style="display: none">
+					<p class="col-md-3">
+						<a asp-action="">Add user to team</a>
+					</p>
+				</div>
+				
+				<div class="col-md-12" id="teamUserTable">
+				</div>
+			</form>
+		</section>
+	</div>
+</div>
+
