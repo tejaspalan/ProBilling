@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using ProBilling.Authentication;
 using ProBilling.Class;
 using ProBilling.Data;
 using ProBilling.Models;
@@ -20,14 +22,16 @@ namespace ProBilling.Controllers
             _context = context;
         }
 
-        // GET: Teams
-        public async Task<IActionResult> Index()
+	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
+		// GET: Teams
+		public async Task<IActionResult> Index()
         {
             return View(await _context.Team.ToListAsync());
         }
 
-        // GET: Teams/Details/5
-        public async Task<IActionResult> Details(int? id)
+	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
+		// GET: Teams/Details/5
+		public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -44,8 +48,9 @@ namespace ProBilling.Controllers
             return View(team);
         }
 
-        // GET: Teams/Create
-        public IActionResult Create()
+	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
+		// GET: Teams/Create
+		public IActionResult Create()
         {
             return View();
         }
@@ -55,6 +60,7 @@ namespace ProBilling.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+		[Authorize(PolicyConstants.AdminOnlyPolicy)]
         public async Task<IActionResult> Create([Bind("TeamId,TeamName,CustomerName")] Team team)
         {
             if (ModelState.IsValid)
@@ -66,8 +72,9 @@ namespace ProBilling.Controllers
             return View(team);
         }
 
-        // GET: Teams/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+		// GET: Teams/Edit/5
+		[Authorize(PolicyConstants.AdminOnlyPolicy)]
+		public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -87,7 +94,8 @@ namespace ProBilling.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TeamId,TeamName,CustomerName")] Team team)
+        [Authorize(PolicyConstants.AdminOnlyPolicy)]
+		public async Task<IActionResult> Edit(int id, [Bind("TeamId,TeamName,CustomerName")] Team team)
         {
             if (id != team.TeamId)
             {
@@ -117,8 +125,9 @@ namespace ProBilling.Controllers
             return View(team);
         }
 
-        // GET: Teams/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+		// GET: Teams/Delete/5
+		[Authorize(PolicyConstants.AdminOnlyPolicy)]
+		public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -138,7 +147,8 @@ namespace ProBilling.Controllers
         // POST: Teams/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [Authorize(PolicyConstants.AdminOnlyPolicy)]
+		public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var team = await _context.Team.SingleOrDefaultAsync(m => m.TeamId == id);
             _context.Team.Remove(team);
@@ -146,6 +156,7 @@ namespace ProBilling.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
 		public async Task<IActionResult> AddUserToTeam()
 		{
 			var listOfTeams = await _context.Team.ToListAsync();
@@ -167,24 +178,35 @@ namespace ProBilling.Controllers
 			return View();
 		}
 
-	    public async Task<IActionResult> GetUserForTeam(int teamId)
+	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
+		public async Task<IActionResult> GetAllAvailableUsers()
 	    {
-		    var user = await _context.TeamUserMapping.Include(item => item.User).Where(item => item.TeamId == teamId).ToListAsync();
+		    var userList = await _context.Users.Where(item =>  item.TeamUserMapping.All(x => x.UserId != item.Id) && item.Designation != 1000 || item.Designation == 100 || item.Designation ==200).ToListAsync();
 		    List<TeamTableViewModel> teamTableViewModels = new List<TeamTableViewModel>();
-		  //  foreach (ApplicationUser appUser in user)
-		  //  {
-			 //   TeamTableViewModel teamTableViewModel = new TeamTableViewModel
-			 //   {
-				//	UserName = appUser.Name,
-				//	Designation = appUser.Designation,
-				//	Email = appUser.Email
-			 //   };
+			foreach (ApplicationUser appUser in userList)
+			{
+				TeamTableViewModel teamTableViewModel = new TeamTableViewModel
+				{
+					UserName = appUser.Name,
+					Designation = ((DesignationEnum)appUser.Designation).ToString(),
+					Email = appUser.Email,
+					UserId = appUser.Id
+				};
 
-				//teamTableViewModels.Add(teamTableViewModel);
+				teamTableViewModels.Add(teamTableViewModel);
 
-		  //  }
-		    return PartialView("TeamTable", teamTableViewModels);
+			}
+			return PartialView("TeamTable", teamTableViewModels);
 
+		}
+
+	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
+		public async Task<IActionResult> InsertUserToTeam(int teamId, string userId)
+	    {
+		    TeamUserMapping teamUserMapping = new TeamUserMapping {TeamId = teamId, UserId = userId};
+			_context.Add(teamUserMapping);
+			await _context.SaveChangesAsync();
+			return RedirectToAction(nameof(GetAllAvailableUsers));
 		}
 
 		private bool TeamExists(int id)

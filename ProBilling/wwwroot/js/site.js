@@ -37,20 +37,36 @@
     $("#teamUser").change(function () {
         var teamId = $(this).find("option:selected").val();
         if (teamId !== "") {
-            $("#addNewUser").css("display", "block");
             $.ajax({
-                url: "/Teams/GetUserForTeam",
-                data: { "teamId": parseInt(teamId,10) },
+                url: "/Teams/GetAllAvailableUsers",
                 dataType: "html",
                 cache: false,
+                async:false,
                 success: function (result) {
-                    $("#teamUserTable").html(result);
+                    $("#userTable").html(result);
                 }
             });
-        } else {
-            $("#addNewUser").css("display", "none");
         }
 
+    });
+
+    $("body").on("click",".addclass",function () {
+
+        var userId = $(this).closest("tr").attr("id");
+        var teamId = $("#teamUser").find("option:selected").val();
+
+	    if (teamId !== "") {
+		    $.ajax({
+			    url: "/Teams/InsertUserToTeam",
+			    data: { "teamId": teamId, "userId": userId },
+			    dataType: "html",
+			    cache: false,
+                success: function (result) {
+                    alert("User successfully added to the selected team !")
+                    $("#userTable").html(result);
+			    }
+		    });
+	    }
     });
 
 }(window.probilling = window.probilling || {}, jQuery));

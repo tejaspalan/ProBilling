@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ProBilling.Authentication;
 using ProBilling.Class;
 using ProBilling.Models;
 
@@ -15,7 +17,6 @@ namespace ProBilling.Controllers
 		public IActionResult Index()
 		{
 			ActionResult result = View();
-
 			if (User.Identity.Name != null && User.Identity.Name.Equals("vibhavmaheshwari@gmail.com"))
 			{
 				result = RedirectToAction("ScrumMasterIndex");

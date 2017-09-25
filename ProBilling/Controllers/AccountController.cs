@@ -206,17 +206,18 @@ namespace ProBilling.Controllers
         }
 
         [HttpGet]
-        [Authorize(PolicyConstants.AdminOnlyPolicy)]
-        public IActionResult Register(string returnUrl = null)
+		[Authorize(PolicyConstants.AdminOnlyPolicy)]
+		public IActionResult Register(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            return View();
+	        LoadDesignationsViewBag();
+			return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(PolicyConstants.AdminOnlyPolicy)]
-        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+		[Authorize(PolicyConstants.AdminOnlyPolicy)]
+		public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
@@ -237,7 +238,8 @@ namespace ProBilling.Controllers
                 }
                 AddErrors(result);
             }
-
+            else
+	            LoadDesignationsViewBag();
             // If we got this far, something failed, redisplay form
             return View(model);
         }
@@ -460,6 +462,28 @@ namespace ProBilling.Controllers
             }
         }
 
-        #endregion
-    }
+		#endregion
+
+	    #region Private Methods
+
+	    private void LoadDesignationsViewBag()
+	    {
+			var designations = new List<SelectListItem>();
+
+		    designations.Add(new SelectListItem
+		    {
+			    Text = "Select",
+			    Value = ""
+		    });
+
+		    foreach (DesignationEnum eVal in Enum.GetValues(typeof(DesignationEnum)))
+		    {
+			    designations.Add(new SelectListItem { Text = Enum.GetName(typeof(DesignationEnum), eVal), Value = ((int)eVal).ToString() });
+		    }
+
+		    ViewBag.Designation = designations;
+		}
+
+	    #endregion
+	}
 }

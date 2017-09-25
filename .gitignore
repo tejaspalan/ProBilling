@@ -295,3 +295,5 @@ __pycache__/
 *.xsd.cs
 /ProBilling/Data/Migrations/20170921170729_first.cs
 /ProBilling/Data/Migrations/20170921170729_first.Designer.cs
+/ProBilling/Data/Migrations/20170924112340_second.cs
+/ProBilling/Data/Migrations/20170924112340_second.Designer.cs

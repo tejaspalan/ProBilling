@@ -7,6 +7,8 @@ namespace ProBilling.Models
 {
     public class TeamTableViewModel
     {
+	    public string UserId;
+
 	    public string UserName;
 
 	    public string Designation;
