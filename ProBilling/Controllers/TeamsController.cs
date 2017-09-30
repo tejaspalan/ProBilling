@@ -196,17 +196,54 @@ namespace ProBilling.Controllers
 				teamTableViewModels.Add(teamTableViewModel);
 
 			}
+		    ViewBag.ShowAdd = true;
 			return PartialView("TeamTable", teamTableViewModels);
 
+		}
+
+	    public async Task<IActionResult> GetUsersForTheTeam(int teamId)
+	    {
+			var userList = await _context.Users.Where(item => item.TeamUserMapping.Any(x => x.TeamId == teamId && x.UserId == item.Id) && item.Designation != 1000).ToListAsync();
+		    List<TeamTableViewModel> teamTableViewModels = new List<TeamTableViewModel>();
+		    foreach (ApplicationUser appUser in userList)
+		    {
+			    TeamTableViewModel teamTableViewModel = new TeamTableViewModel
+			    {
+				    UserName = appUser.Name,
+				    Designation = ((DesignationEnum)appUser.Designation).ToString(),
+				    Email = appUser.Email,
+				    UserId = appUser.Id
+			    };
+
+			    teamTableViewModels.Add(teamTableViewModel);
+
+		    }
+		    ViewBag.ShowAdd = false;
+		    ViewBag.ShowRemove = true;
+		
+			return PartialView("TeamTable", teamTableViewModels);
 		}
 
 	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
 		public async Task<IActionResult> InsertUserToTeam(int teamId, string userId)
 	    {
-		    TeamUserMapping teamUserMapping = new TeamUserMapping {TeamId = teamId, UserId = userId};
-			_context.Add(teamUserMapping);
-			await _context.SaveChangesAsync();
-			return RedirectToAction(nameof(GetAllAvailableUsers));
+		    IQueryable<TeamUserMapping> teamUserMappings = _context.TeamUserMapping.Where(item => item.UserId == userId && item.TeamId == teamId);
+		    if (!teamUserMappings.Any())
+		    {
+			    TeamUserMapping teamUserMapping = new TeamUserMapping {TeamId = teamId, UserId = userId};
+			    _context.Add(teamUserMapping);
+			    await _context.SaveChangesAsync();
+		    }
+		    return RedirectToAction(nameof(GetAllAvailableUsers));
+	    }
+
+	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
+	    public async Task<IActionResult> RemoveUserFromTeam(int teamId, string userId)
+	    {
+			var teamUserMapping = await _context.TeamUserMapping.SingleOrDefaultAsync(m => m.TeamId == teamId && m.UserId == userId);
+		    _context.TeamUserMapping.Remove(teamUserMapping);
+		    await _context.SaveChangesAsync();
+		    return RedirectToAction(nameof(GetAllAvailableUsers));
 		}
 
 		private bool TeamExists(int id)

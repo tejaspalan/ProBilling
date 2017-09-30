@@ -27,9 +27,18 @@
 				<td>
 					@Html.DisplayFor(model => item.Email)
 				</td>
-				<td>
-					<button class="addclass" type="button">Add</button>
-				</td>
+				@if (ViewBag.ShowAdd!= null && ViewBag.ShowAdd)
+				{
+					<td>
+						<button class="addclass" type="button">Add</button>
+					</td>
+				}
+				@if (ViewBag.ShowRemove != null && ViewBag.ShowRemove)
+				{
+					<td>
+						<button class="removeClass" type="button">Remove</button>
+					</td>
+				}
 			</tr>
 		}
 	</tbody>
