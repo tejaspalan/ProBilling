@@ -17,7 +17,8 @@ namespace ProBilling.Models
         public int TeamId { get; set; }
         public Team Team { get; set; }
         public List<SprintActivity> SprintActivities { get; set; }
+        public int SprintReportId { get; set; }
+        public SprintReport SprintReport { get; set; }
         public bool IsSprintCompletedSuccessfully { get; set; }
-        public string CustomerRemarks { get; set; }
     }
 }

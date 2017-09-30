@@ -44,6 +44,9 @@ namespace ProBilling.Data
             builder.Entity<SprintActivity>()
                 .HasKey(activity => activity.ActivityId);
 
+            builder.Entity<SprintReport>()
+                .HasKey(sprintReport => sprintReport.SprintReportId);
+
             //Sprint belongs to 1 team but 1 team can have many sprints
             builder.Entity<Sprint>()
                 .HasOne(sprint => sprint.Team)
@@ -74,6 +77,11 @@ namespace ProBilling.Data
                 .HasOne(teamUserMapping => teamUserMapping.Team)
                 .WithMany(team => team.TeamUserMapping)
                 .HasForeignKey(teamUserMapping => teamUserMapping.TeamId);
+
+            builder.Entity<Sprint>()
+                .HasOne(sprint => sprint.SprintReport)
+                .WithOne(report => report.Sprint)
+                .HasForeignKey<Sprint>(sprint => sprint.SprintReportId);
         }
 
         public DbSet<ProBilling.Models.Team> Team { get; set; }
