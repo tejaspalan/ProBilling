@@ -9,7 +9,8 @@ namespace ProBilling.Models
     {
         public int TeamId { get; set; }
         public string TeamName { get; set; }
-        public string CustomerName { get; set; }
+        public string CustomerId { get; set; }
+        public ApplicationUser Customer { get; set; }
         public List<Sprint> Sprints { get; set; }
         public List<TeamUserMapping> TeamUserMapping { get; set; }
     }
