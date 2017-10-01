@@ -26,7 +26,7 @@ namespace ProBilling.Controllers
 		// GET: Teams
 		public async Task<IActionResult> Index()
         {
-            return View(await _context.Team.ToListAsync());
+            return View(await _context.Team.Include(item => item.Customer).ToListAsync());
         }
 
 	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
@@ -39,6 +39,7 @@ namespace ProBilling.Controllers
             }
 
             var team = await _context.Team
+				.Include(item => item.Customer)
                 .SingleOrDefaultAsync(m => m.TeamId == id);
             if (team == null)
             {
@@ -50,18 +51,19 @@ namespace ProBilling.Controllers
 
 	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
 		// GET: Teams/Create
-		public IActionResult Create()
-        {
-            return View();
-        }
+		public async Task<IActionResult> Create()
+	    {
+		    await LoadCustomerList();
+		    return View();
+	    }
 
-        // POST: Teams/Create
+	    // POST: Teams/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
 		[Authorize(PolicyConstants.AdminOnlyPolicy)]
-        public async Task<IActionResult> Create([Bind("TeamId,TeamName,CustomerName")] Team team)
+        public async Task<IActionResult> Create([Bind("TeamId,TeamName,CustomerId")] Team team)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +88,8 @@ namespace ProBilling.Controllers
             {
                 return NotFound();
             }
-            return View(team);
+	        await LoadCustomerList();
+			return View(team);
         }
 
         // POST: Teams/Edit/5
@@ -135,7 +138,8 @@ namespace ProBilling.Controllers
             }
 
             var team = await _context.Team
-                .SingleOrDefaultAsync(m => m.TeamId == id);
+	            .Include(item => item.Customer)
+				.SingleOrDefaultAsync(m => m.TeamId == id);
             if (team == null)
             {
                 return NotFound();
@@ -181,7 +185,7 @@ namespace ProBilling.Controllers
 	    [Authorize(PolicyConstants.AdminOnlyPolicy)]
 		public async Task<IActionResult> GetAllAvailableUsers()
 	    {
-		    var userList = await _context.Users.Where(item =>  item.TeamUserMapping.All(x => x.UserId != item.Id) && item.Designation != 1000 || item.Designation == 100 || item.Designation ==200).ToListAsync();
+		    var userList = await _context.Users.Where(item =>  item.TeamUserMapping.All(x => x.UserId != item.Id) && item.Designation != 1000 && item.Designation != 300 || item.Designation == 100 || item.Designation ==200).ToListAsync();
 		    List<TeamTableViewModel> teamTableViewModels = new List<TeamTableViewModel>();
 			foreach (ApplicationUser appUser in userList)
 			{
@@ -203,7 +207,7 @@ namespace ProBilling.Controllers
 
 	    public async Task<IActionResult> GetUsersForTheTeam(int teamId)
 	    {
-			var userList = await _context.Users.Where(item => item.TeamUserMapping.Any(x => x.TeamId == teamId && x.UserId == item.Id) && item.Designation != 1000).ToListAsync();
+			var userList = await _context.Users.Where(item => item.TeamUserMapping.Any(x => x.TeamId == teamId && x.UserId == item.Id) && item.Designation != 1000 && item.Designation != 300).ToListAsync();
 		    List<TeamTableViewModel> teamTableViewModels = new List<TeamTableViewModel>();
 		    foreach (ApplicationUser appUser in userList)
 		    {
@@ -250,5 +254,22 @@ namespace ProBilling.Controllers
         {
             return _context.Team.Any(e => e.TeamId == id);
         }
-    }
+
+	    private async Task LoadCustomerList()
+	    {
+		    var customerList = await _context.Users.Where(item => item.Designation == (int)(DesignationEnum.Customer))
+			    .ToListAsync();
+		    var customers = new List<SelectListItem>();
+		    customers.Add(new SelectListItem
+		    {
+			    Text = "Select",
+			    Value = ""
+		    });
+		    foreach (ApplicationUser customer in customerList)
+		    {
+			    customers.Add(new SelectListItem { Text = customer.Name, Value = customer.Id });
+		    }
+		    ViewBag.Customer = customers;
+	    }
+	}
 }
