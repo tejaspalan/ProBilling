@@ -1,0 +1,26 @@
+﻿@model ProBilling.Models.Sprint
+@{
+	ViewData["Title"] = "ViewAllSprintsForTeam";
+}
+<div class="row">
+	<div class="col-md-8">
+		<section>
+			<form asp-controller="" asp-action="" asp-route-returnurl="" method="post" class="form-horizontal">
+				<h4>View all sprints for team</h4>
+				<hr />
+				<div class="form-group">
+					<label asp-for="Team" class=" col-md-1 control-label"></label>
+					<div class="col-md-6">
+						<select id="teamForSprint" class="form-control" asp-for="Team" asp-items="ViewBag.Teams"></select>
+					</div>
+				</div>
+				<br />
+				<h4>Sprint list</h4>
+				<div class="col-md-12" id="sprintTable">
+				</div>
+
+			</form>
+		</section>
+	</div>
+</div>
+

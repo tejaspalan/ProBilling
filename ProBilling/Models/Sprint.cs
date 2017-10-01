@@ -10,14 +10,14 @@ namespace ProBilling.Models
     {
         public int SprintId { get; set; }
         public int SprintNumber { get; set; }
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime SprintStart { get; set; }
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime SprintEnd { get; set; }
         public int TeamId { get; set; }
         public Team Team { get; set; }
         public List<SprintActivity> SprintActivities { get; set; }
-        public bool IsSprintCompletedSuccessfully { get; set; }
-        public string CustomerRemarks { get; set; }
+        //public bool IsSprintCompletedSuccessfully { get; set; }
+        //public string CustomerRemarks { get; set; }
     }
 }

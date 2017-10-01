@@ -14,7 +14,7 @@
 				<div class="col-md-12" id="teamTable">
 				</div>
 				<div class="form-group">
-					<a asp-action="ViewPreviousSprints" class="btn btn-default">View previous sprint </a> | <a asp-action="ViewCurrentSprint" class="btn btn-default">View current sprint</a> | <a asp-action="" class="btn btn-default">Create new sprint</a>
+					<a asp-action="ViewPreviousSprints" class="btn btn-default">View previous sprint </a> | <a asp-action="ViewCurrentSprint" asp-controller="Sprints" class="btn btn-default">View current sprint</a> | <a asp-action="Create" asp-controller="Sprints" class="btn btn-default">Create new sprint</a> | <a asp-action="ViewAllSprintsForTeam" asp-controller="Sprints" class="btn btn-default">View all sprints</a>
 				</div>
 			</form>
 		</section>

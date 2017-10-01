@@ -1,11 +1,11 @@
 ﻿// Write your Javascript code.
 (function (probilling, $) {
 
-    $("#selectTeam").change(function () {
+    $("#selectTeam").on("change",function () {
 
         var teamId = $(this).find("option:selected").val();
         $.ajax({
-            url: "/Home/TeamTable/",
+            url: "/Teams/GetUsersForTheTeam",
             data: { "teamId": teamId },
             dataType: "html",
             cache: false,
@@ -38,22 +38,22 @@
         var teamId = $(this).find("option:selected").val();
         if (teamId !== "") {
 
-	        $.ajax({
+            $.ajax({
                 url: "/Teams/GetUsersForTheTeam",
                 dataType: "html",
-                data: { "teamId": teamId},
-		        cache: false,
-		        async: false,
-		        success: function (result) {
+                data: { "teamId": teamId },
+                cache: false,
+                async: false,
+                success: function (result) {
                     $("#teamUserTable").html(result);
-		        }
-	        });
+                }
+            });
 
             $.ajax({
                 url: "/Teams/GetAllAvailableUsers",
                 dataType: "html",
                 cache: false,
-                async:false,
+                async: false,
                 success: function (result) {
                     $("#userTable").html(result);
                 }
@@ -62,61 +62,102 @@
 
     });
 
-    $("body").on("click",".addclass",function () {
+    $("body").on("click", ".addclass", function () {
 
         var userId = $(this).closest("tr").attr("id");
         var teamId = $("#teamUser").find("option:selected").val();
 
-	    if (teamId !== "") {
-		    $.ajax({
-			    url: "/Teams/InsertUserToTeam",
-			    data: { "teamId": teamId, "userId": userId },
-			    dataType: "html",
-			    cache: false,
+        if (teamId !== "") {
+            $.ajax({
+                url: "/Teams/InsertUserToTeam",
+                data: { "teamId": teamId, "userId": userId },
+                dataType: "html",
+                cache: false,
                 success: function (result) {
-	                alert("User successfully added to the selected team !");
+                    alert("User successfully added to the selected team !");
                     $("#userTable").html(result);
-	                $.ajax({
-		                url: "/Teams/GetUsersForTheTeam",
-		                dataType: "html",
-		                data: { "teamId": teamId },
-		                cache: false,
-		                async: false,
-		                success: function (newResult) {
+                    $.ajax({
+                        url: "/Teams/GetUsersForTheTeam",
+                        dataType: "html",
+                        data: { "teamId": teamId },
+                        cache: false,
+                        async: false,
+                        success: function (newResult) {
                             $("#teamUserTable").html(newResult);
-		                }
-	                });
-			    }
-		    });
-	    }
+                        }
+                    });
+                }
+            });
+        }
     });
 
     $("body").on("click", ".removeClass", function () {
 
-		var userId = $(this).closest("tr").attr("id");
-		var teamId = $("#teamUser").find("option:selected").val();
+        var userId = $(this).closest("tr").attr("id");
+        var teamId = $("#teamUser").find("option:selected").val();
 
-		if (teamId !== "") {
-			$.ajax({
+        if (teamId !== "") {
+            $.ajax({
                 url: "/Teams/RemoveUserFromTeam",
-				data: { "teamId": teamId, "userId": userId },
-				dataType: "html",
-				cache: false,
-				success: function (result) {
-					alert("User successfully removed from the selected team !");
-					$("#userTable").html(result);
-					$.ajax({
-						url: "/Teams/GetUsersForTheTeam",
-						dataType: "html",
-						data: { "teamId": teamId },
-						cache: false,
-						async: false,
-						success: function (newResult) {
-							$("#teamUserTable").html(newResult);
-						}
-					});
-				}
-			});
+                data: { "teamId": teamId, "userId": userId },
+                dataType: "html",
+                cache: false,
+                success: function (result) {
+                    alert("User successfully removed from the selected team !");
+                    $("#userTable").html(result);
+                    $.ajax({
+                        url: "/Teams/GetUsersForTheTeam",
+                        dataType: "html",
+                        data: { "teamId": teamId },
+                        cache: false,
+                        async: false,
+                        success: function (newResult) {
+                            $("#teamUserTable").html(newResult);
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+    $("#teamForSprint").change(function () {
+        var teamId = $("#teamForSprint").find("option:selected").val();
+        if (teamId !== "") {
+            $.ajax({
+                url: "/Sprints/Index",
+                dataType: "html",
+                data: { "teamId": teamId },
+                cache: false,
+                async: false,
+                success: function (result) {
+                    $("#sprintTable").html(result);
+                }
+            });
+        }
+    });
+
+	$("#selectTeamForCurrentSprint").change(function() {
+        var teamId = $("#selectTeamForCurrentSprint").find("option:selected").val();
+        if (teamId !== "") {
+	        $.ajax({
+		        url: "/Sprints/LoadSprintDates",
+		        dataType: "html",
+		        data: { "teamId": teamId },
+		        cache: false,
+		        async: false,
+		        success: function (result) {
+		        }
+	        });
+		}
+	});
+
+	$("select").each(function () {
+
+		var length = $(this).find("option").length;
+        if (length === 2) {
+	        var id = $(this).attr("id");
+			$("#" + id +" option:last").attr("selected", "selected");
+			$("#"+id).trigger("change");
 		}
 	});
 

@@ -4,23 +4,42 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using ProBilling.Authentication;
 using ProBilling.Class;
+using ProBilling.Data;
 using ProBilling.Models;
 
 namespace ProBilling.Controllers
 {
 	public class HomeController : Controller
 	{
-		public IActionResult Index()
+		private readonly ApplicationDbContext _context;
+		private readonly UserManager<ApplicationUser> _userManager;
+
+		public HomeController(ApplicationDbContext context,UserManager<ApplicationUser> userManger)
+		{
+			_context = context;
+			_userManager = userManger;
+		}
+
+		public async Task<IActionResult> Index()
 		{
 			ActionResult result = View();
-			if (User.Identity.Name != null && User.Identity.Name.Equals("vibhavmaheshwari@gmail.com"))
-			{
+			var currectUserDesignation =
+				(DesignationEnum) (int.Parse(User.Claims.First(c => c.Type == ClaimsConstants.Designation).Value));
+
+			if (currectUserDesignation == DesignationEnum.ScrumMaster)
 				result = RedirectToAction("ScrumMasterIndex");
-			}
+			if (currectUserDesignation == DesignationEnum.Admin)
+				result = RedirectToAction("AdminIndex");
+
+			var user = await _userManager.GetUserAsync(HttpContext.User);
+
 			return result;
 		}
 
@@ -43,21 +62,29 @@ namespace ProBilling.Controllers
 			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
 
-		public IActionResult ScrumMasterIndex()
+		public IActionResult AdminIndex()
 		{
+			return View();
+		}
+
+		[Authorize(PolicyConstants.AdminSmCdlPolicy)]
+		public async Task<IActionResult> ScrumMasterIndex()
+		{
+			var user = await _userManager.GetUserAsync(HttpContext.User);
+			var listOfTeams = await _context.Team.Where(item => item.TeamUserMapping.Any(x => x.UserId == user.Id)).ToListAsync();
+
 			var teams = new List<SelectListItem>();
 			teams.Add(new SelectListItem
 			{
 				Text = "Select",
 				Value = ""
 			});
-
-			foreach (Teams eVal in Enum.GetValues(typeof(Teams)))
+			foreach (Team team in listOfTeams)
 			{
-				teams.Add(new SelectListItem { Text = Enum.GetName(typeof(Teams), eVal), Value = eVal.ToString() });
+				teams.Add(new SelectListItem { Text = team.TeamName, Value = team.TeamId.ToString() });
 			}
-
 			ViewBag.Teams = teams;
+
 			return View();
 		}
 
@@ -222,57 +249,6 @@ namespace ProBilling.Controllers
 			};
 
 			return PartialView("SprintReport", sprintReportViewModels);
-		}
-
-		public IActionResult ViewCurrentSprint()
-		{
-			var teams = new List<SelectListItem>();
-			teams.Add(new SelectListItem
-			{
-				Text = "Select",
-				Value = ""
-			});
-
-			foreach (Teams eVal in Enum.GetValues(typeof(Teams)))
-			{
-				teams.Add(new SelectListItem { Text = Enum.GetName(typeof(Teams), eVal), Value = eVal.ToString() });
-			}
-
-			ViewBag.Teams = teams;
-
-			var sprintDates = new List<SelectListItem>();
-
-			sprintDates.Add(new SelectListItem
-			{
-				Text = "Select",
-				Value = ""
-			});
-
-			sprintDates.Add(new SelectListItem
-			{
-				Text = "Monday 01 Jan 2017",
-				Value = "01-01-2017"
-			});
-			sprintDates.Add(new SelectListItem
-			{
-				Text = "Tuesday 02 Jan 2017",
-				Value = "02-01-2017"
-			});
-			sprintDates.Add(new SelectListItem
-			{
-				Text = "Wednesday 03 Jan 2017",
-				Value = "03-01-2017"
-			});
-			sprintDates.Add(new SelectListItem
-			{
-				Text = "Thrusday 04 Jan 2017",
-				Value = "03-01-2017"
-			});
-			
-
-			ViewBag.Sprints = sprintDates;
-
-			return View();
 		}
 	}
 }
