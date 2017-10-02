@@ -141,13 +141,33 @@
         if (teamId !== "") {
 	        $.ajax({
 		        url: "/Sprints/LoadSprintDates",
-		        dataType: "html",
+                dataType: "json",
 		        data: { "teamId": teamId },
 		        cache: false,
 		        async: false,
-		        success: function (result) {
-		        }
+                success: function (result) {
+                    $.each(result, function () {
+                        $("#selectSprintDate").append($("<option/>").val(this.value).text(this.text));
+	                });
+                }
 	        });
+		}
+    });
+
+	$("#viewCurrentReport").click(function() {
+		var teamId = $("#selectTeamForCurrentSprint").find("option:selected").val();
+        var date = $("#selectSprintDate").find("option:selected").val();
+		if (teamId !== "" && date !== "") {
+			$.ajax({
+				url: "/Sprints/LoadReportForSprintDate",
+				dataType: "html",
+				data: { "teamId": teamId ,"date":date},
+				cache: false,
+				async: false,
+				success: function (result) {
+                    $("#currentSprintReport").html(result);
+				}
+            });
 		}
 	});
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -51,6 +52,69 @@ namespace ProBilling.Controllers
 			return View();
 		}
 
+		public async Task<IActionResult> LoadSprintDates(int teamId)
+		{
+			DateTime currentDateTime = DateTime.Now;
+			var sprints = await _context.Sprint.Where(item => item.TeamId == teamId && item.SprintStart <= currentDateTime &&
+														item.SprintEnd >= currentDateTime).ToListAsync();
+			var currentSprint = sprints.FirstOrDefault();
+			var sprintDates = new List<SelectListItem>();
+			if (currentSprint != null)
+			{
+				List<DateTime> allDates = GetDatesBetween(currentSprint.SprintStart, currentSprint.SprintEnd);
+				
+				foreach (DateTime date in allDates)
+				{
+					sprintDates.Add(new SelectListItem { Text = date.DayOfWeek + " " + date.Date.ToString("dd-MM-yyyy"), Value = date.ToString("dd-MM-yyyy",CultureInfo.InvariantCulture) });
+				}
+			}
+
+			return Json(sprintDates);
+		}
+
+		public async Task<IActionResult> LoadReportForSprintDate(int teamId, string date)
+		{
+			DateTime parsedDate = DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+			var sprintList = await _context.Sprint
+				.Where(item => item.TeamId == teamId && item.SprintStart <= parsedDate && item.SprintEnd >= parsedDate).ToListAsync();
+
+			IList<SprintActivity> sprintActivities = new List<SprintActivity>();
+
+			Sprint sprint = sprintList.FirstOrDefault();
+			if (sprint != null)
+				 sprintActivities = await _context.SprintActivity
+					.Where(item => item.SprintId == sprint.SprintId && item.ActivityDate == parsedDate).ToListAsync();
+
+			List<DailyReportViewModel> dailyReportViewModels = new List<DailyReportViewModel>();
+			if (!sprintActivities.Any())
+			{
+				var userList = await _context.Users.Where(item => item.TeamUserMapping.Any(x => x.TeamId == teamId && x.UserId == item.Id) && item.Designation != 1000 && item.Designation != 300 && item.Designation!= 200).ToListAsync();
+				foreach (ApplicationUser user in userList)
+				{
+					DailyReportViewModel dailyReportViewModel = new DailyReportViewModel
+					{
+						UserId = user.Id,
+						UserName = user.Name,
+						Designation = ((DesignationEnum)user.Designation).ToString(),
+						IsBillable = true,
+						TeamId = teamId,
+						ActivityDate = parsedDate
+					};
+					dailyReportViewModels.Add(dailyReportViewModel);
+				}
+			}
+			LoadViewBags();
+			return PartialView("DailySprintReport", dailyReportViewModels);
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public IActionResult SaveSprintActivity(IEnumerable<DailyReportViewModel> dailyReportViewModels)
+		{
+			return RedirectToAction(nameof(ViewCurrentSprint));
+		}
+
+
 		// GET: Sprints/Details/5
 		public async Task<IActionResult> Details(int? id)
 		{
@@ -87,14 +151,15 @@ namespace ProBilling.Controllers
 			var sprintList = await _context.Sprint.Where(item => item.TeamId == sprint.TeamId).ToListAsync();
 			foreach (Sprint s in sprintList)
 			{
-				if (sprint.SprintStart >= s.SprintStart || sprint.SprintEnd <= s.SprintEnd || sprint.SprintEnd >= s.SprintStart || sprint.SprintEnd <= s.SprintEnd)
+				if ((sprint.SprintStart >= s.SprintStart && sprint.SprintStart <= s.SprintEnd)
+					|| (sprint.SprintEnd >= s.SprintStart && sprint.SprintEnd <= s.SprintEnd))
 					ModelState.AddModelError("", "You cannot add the sprint for the selected dates");
 			}
 			if (ModelState.IsValid)
 			{
 				_context.Add(sprint);
 				await _context.SaveChangesAsync();
-				return RedirectToAction(nameof(Index));
+				return RedirectToAction(nameof(ViewAllSprintsForTeam));
 			}
 			await LoadTeamsForUser();
 			return View(sprint);
@@ -209,10 +274,55 @@ namespace ProBilling.Controllers
 		private List<DateTime> GetDatesBetween(DateTime startDate, DateTime endDate)
 		{
 			List<DateTime> allDates = new List<DateTime>();
+
 			for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
-				allDates.Add(date);
+				if (date.DayOfWeek == DayOfWeek.Monday || 
+					date.DayOfWeek == DayOfWeek.Tuesday ||
+					date.DayOfWeek == DayOfWeek.Wednesday ||
+					date.DayOfWeek == DayOfWeek.Thursday ||
+					date.DayOfWeek == DayOfWeek.Friday)
+					allDates.Add(date);
+
 			return allDates;
 
+		}
+
+		private void LoadViewBags()
+		{
+			var availableFor = new List<SelectListItem>();
+
+			availableFor.Add(new SelectListItem
+			{
+				Text = "Select",
+				Value = ""
+			});
+
+			foreach (AvailableFor eVal in Enum.GetValues(typeof(AvailableFor)))
+			{
+				availableFor.Add(
+					new SelectListItem { Text = Enum.GetName(typeof(AvailableFor), eVal), Value = ((int)eVal).ToString() });
+			}
+
+			ViewBag.AvailableFor = availableFor;
+
+			var companyMeeting = new List<SelectListItem>();
+
+			companyMeeting.Add(new SelectListItem
+			{
+				Text = "Select",
+				Value = ""
+			});
+
+			foreach (CompanyMeeting eVal in Enum.GetValues(typeof(CompanyMeeting)))
+			{
+				companyMeeting.Add(new SelectListItem
+				{
+					Text = Enum.GetName(typeof(CompanyMeeting), eVal),
+					Value = ((int)eVal).ToString()
+				});
+			}
+
+			ViewBag.CompanyMeeting = companyMeeting;
 		}
 	}
 }

@@ -77,11 +77,6 @@ namespace ProBilling.Data
                 .HasOne(teamUserMapping => teamUserMapping.Team)
                 .WithMany(team => team.TeamUserMapping)
                 .HasForeignKey(teamUserMapping => teamUserMapping.TeamId);
-
-            builder.Entity<Sprint>()
-                .HasOne(sprint => sprint.SprintReport)
-                .WithOne(report => report.Sprint)
-                .HasForeignKey<Sprint>(sprint => sprint.SprintReportId);
         }
 
         public DbSet<ProBilling.Models.Team> Team { get; set; }

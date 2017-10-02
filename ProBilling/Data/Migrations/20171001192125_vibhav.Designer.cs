@@ -11,9 +11,10 @@ using System;
 namespace ProBilling.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20171001192125_vibhav")]
+    partial class vibhav
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,8 +146,6 @@ namespace ProBilling.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
-                    b.Property<bool>("IsBackup");
-
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
@@ -199,11 +198,16 @@ namespace ProBilling.Data.Migrations
 
                     b.Property<int>("SprintNumber");
 
+                    b.Property<int>("SprintReportId");
+
                     b.Property<DateTime>("SprintStart");
 
                     b.Property<int>("TeamId");
 
                     b.HasKey("SprintId");
+
+                    b.HasIndex("SprintReportId")
+                        .IsUnique();
 
                     b.HasIndex("TeamId");
 
@@ -215,8 +219,6 @@ namespace ProBilling.Data.Migrations
                     b.Property<long>("ActivityId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("ActivityDate");
-
                     b.Property<double>("AvailableHours");
 
                     b.Property<double>("BackupHours");
@@ -224,6 +226,8 @@ namespace ProBilling.Data.Migrations
                     b.Property<double>("CompanyMeetingHours");
 
                     b.Property<double>("HolidayOvertimeHours");
+
+                    b.Property<bool>("IsBillable");
 
                     b.Property<double>("OnsiteHours");
 
@@ -264,8 +268,6 @@ namespace ProBilling.Data.Migrations
                     b.Property<double>("TotalNonBillableHours");
 
                     b.HasKey("SprintReportId");
-
-                    b.HasIndex("SprintId");
 
                     b.ToTable("SprintReport");
                 });
@@ -346,6 +348,11 @@ namespace ProBilling.Data.Migrations
 
             modelBuilder.Entity("ProBilling.Models.Sprint", b =>
                 {
+                    b.HasOne("ProBilling.Models.SprintReport", "SprintReport")
+                        .WithOne("Sprint")
+                        .HasForeignKey("ProBilling.Models.Sprint", "SprintReportId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("ProBilling.Models.Team", "Team")
                         .WithMany("Sprints")
                         .HasForeignKey("TeamId")
@@ -362,14 +369,6 @@ namespace ProBilling.Data.Migrations
                     b.HasOne("ProBilling.Models.ApplicationUser", "User")
                         .WithMany("UserActivities")
                         .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("ProBilling.Models.SprintReport", b =>
-                {
-                    b.HasOne("ProBilling.Models.Sprint", "Sprint")
-                        .WithMany()
-                        .HasForeignKey("SprintId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("ProBilling.Models.Team", b =>

@@ -1,4 +1,6 @@
-﻿namespace ProBilling.Models
+﻿using System;
+
+namespace ProBilling.Models
 {
     public class SprintActivity : IProBillingEntity
     {
@@ -7,7 +9,6 @@
         public int SprintId { get; set; }
         public Sprint Sprint { get; set; }
         public string UserId { get; set; }
-        public bool IsBillable { get; set; }
         public ApplicationUser User { get; set; }
         public double AvailableHours { get; set; }
         public double BackupHours { get; set; }
@@ -16,5 +17,6 @@
         public double OvertimeHours { get; set; }
         public double HolidayOvertimeHours { get; set; }
         public string Remarks { get; set; }
+		public DateTime ActivityDate { get; set; }
     }
 }

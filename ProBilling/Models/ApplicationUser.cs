@@ -8,7 +8,8 @@ namespace ProBilling.Models
     {
         public string Name { get; set; }
         public int Designation { get; set; }
-        public List<TeamUserMapping> TeamUserMapping { get; set; }
+	    public bool IsBackup { get; set; }
+		public List<TeamUserMapping> TeamUserMapping { get; set; }
         public List<SprintActivity> UserActivities { get; set; }
     }
 
@@ -20,4 +21,17 @@ namespace ProBilling.Models
         Customer = 300,
         Admin = 1000,
     }
+
+	public enum AvailableFor
+	{
+		FullDay = 10,
+		HalfDay = 11,
+		Leave = 12,
+	}
+
+	public enum CompanyMeeting
+	{
+		Attended = 3,
+		NotAttended = 4
+	}
 }

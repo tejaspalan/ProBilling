@@ -1,0 +1,117 @@
+﻿@model List<DailyReportViewModel>
+@*@using (Html.BeginForm("SaveSprintActivity", "Sprints", FormMethod.Post, new { dailyReportViewModels = Model}))
+	{*@
+<form asp-controller="Sprints" asp-action="SaveSprintActivity" method="post" role="form">
+	<table class="table table-condensed table-striped table-responsive">
+		<thead>
+			<tr data-item-id="">
+				<th>
+					@Html.DisplayNameFor(model => model.First().UserName)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.First().Designation)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.First().AvailableFor)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.First().TechTalk)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.First().BigSprintDay)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.First().Igrow)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.First().MeetingWithCdl)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.First().Smf)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.First().WoW)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.First().SprintKpi)
+				</th>
+				<th>
+					@Html.DisplayNameFor(model => model.First().ScrumOfScrum)
+				</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			@for (int i = 0; i < Model.Count(); i++)
+			{
+				<tr id="@Model[i].UserId">
+					<td>
+						@Html.DisplayFor(model => Model[i].UserName)
+						@Html.HiddenFor(model => Model[i].TeamId)
+						@Html.HiddenFor(model => Model[i].ActivityDate)
+					</td>
+					<td>
+						@Html.DisplayFor(model => Model[i].Designation)
+					</td>
+					<td>
+						<select class="form-control" asp-for="@Model[i].AvailableFor" asp-items="@ViewBag.AvailableFor"></select>
+					</td>
+					<td>
+						<select class="form-control" asp-for="@Model[i].TechTalk" asp-items="@ViewBag.CompanyMeeting"></select>
+					</td>
+					<td>
+						<select class="form-control" asp-for="@Model[i].BigSprintDay" asp-items="@ViewBag.CompanyMeeting"></select>
+					</td>
+					<td>
+						<select class="form-control" asp-for="@Model[i].Igrow" asp-items="@ViewBag.CompanyMeeting"></select>
+					</td>
+					<td>
+						<select class="form-control" asp-for="@Model[i].MeetingWithCdl" asp-items="@ViewBag.CompanyMeeting"></select>
+					</td>
+					<td>
+						@if (Model[i].Designation == DesignationEnum.ScrumMaster.ToString())
+						{
+							<select class="form-control" asp-for="@Model[i].Smf" asp-items="@ViewBag.CompanyMeeting"></select>
+						}
+						else
+						{
+							<select class="form-control" asp-for="@Model[i].Smf" asp-items="@ViewBag.CompanyMeeting" disabled=""></select>
+						}
+					</td>
+					<td>
+						@if (Model[i].Designation == DesignationEnum.ScrumMaster.ToString())
+						{
+							<select class="form-control" asp-for="@Model[i].WoW" asp-items="@ViewBag.CompanyMeeting"></select>
+						}
+						else
+						{
+							<select class="form-control" asp-for="@Model[i].WoW" asp-items="@ViewBag.CompanyMeeting" disabled=""></select>
+						}
+					</td>
+					<td>
+						@if (Model[i].Designation == DesignationEnum.ScrumMaster.ToString())
+						{
+							<select class="form-control" asp-for="@Model[i].SprintKpi" asp-items="@ViewBag.CompanyMeeting"></select>
+						}
+						else
+						{
+							<select class="form-control" asp-for="@Model[i].SprintKpi" asp-items="@ViewBag.CompanyMeeting" disabled=""></select>
+						}
+					</td>
+					<td>
+						@if (Model[i].Designation == DesignationEnum.ScrumMaster.ToString())
+						{
+							<select class="form-control" asp-for="@Model[i].ScrumOfScrum" asp-items="@ViewBag.CompanyMeeting"></select>
+						}
+						else
+						{
+							<select class="form-control" asp-for="@Model[i].ScrumOfScrum" asp-items="@ViewBag.CompanyMeeting" disabled=""></select>
+						}
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+	<button type="submit" class="btn btn-default">Save</button>
+</form>
+@*}*@
