@@ -82,35 +82,78 @@ namespace ProBilling.Controllers
 
 			Sprint sprint = sprintList.FirstOrDefault();
 			if (sprint != null)
-				 sprintActivities = await _context.SprintActivity
+				 sprintActivities = await _context.SprintActivity.Include(item => item.User)
 					.Where(item => item.SprintId == sprint.SprintId && item.ActivityDate == parsedDate).ToListAsync();
 
 			List<DailyReportViewModel> dailyReportViewModels = new List<DailyReportViewModel>();
 			if (!sprintActivities.Any())
 			{
-				var userList = await _context.Users.Where(item => item.TeamUserMapping.Any(x => x.TeamId == teamId && x.UserId == item.Id) && item.Designation != 1000 && item.Designation != 300 && item.Designation!= 200).ToListAsync();
+				var userList = await _context.Users
+					.Where(item => item.TeamUserMapping.Any(x => x.TeamId == teamId && x.UserId == item.Id) &&
+					               item.Designation != 1000 && item.Designation != 300 && item.Designation != 200).ToListAsync();
 				foreach (ApplicationUser user in userList)
 				{
 					DailyReportViewModel dailyReportViewModel = new DailyReportViewModel
 					{
 						UserId = user.Id,
 						UserName = user.Name,
-						Designation = ((DesignationEnum)user.Designation).ToString(),
-						IsBillable = true,
+						Designation = ((DesignationEnum) user.Designation).ToString(),
+						IsBackup = user.IsBackup,
 						TeamId = teamId,
 						ActivityDate = parsedDate
 					};
 					dailyReportViewModels.Add(dailyReportViewModel);
 				}
 			}
+			else
+				ViewBag.Message = "Data for this date is saved successfully !! Edit feature comming soon";
+
 			LoadViewBags();
 			return PartialView("DailySprintReport", dailyReportViewModels);
 		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult SaveSprintActivity(IEnumerable<DailyReportViewModel> dailyReportViewModels)
+		public async Task<IActionResult> SaveSprintActivity(IEnumerable<DailyReportViewModel> dailyReportViewModels)
 		{
+			if (ModelState.IsValid)
+			{
+				double backupHours = 0.00;
+
+				List<SprintActivity> sprintActivities = new List<SprintActivity>();
+
+				var sprintList = await _context.Sprint
+					.Where(item => item.TeamId == dailyReportViewModels.First().TeamId && item.SprintStart <= dailyReportViewModels.First().ActivityDate && item.SprintEnd >= dailyReportViewModels.First().ActivityDate).ToListAsync();
+
+				Sprint sprint = sprintList.FirstOrDefault();
+				foreach (DailyReportViewModel dailyReport in dailyReportViewModels)
+				{
+					double availableHours = GetAvailableHours(dailyReport);
+					double companyMeetingHours = GetCompanyMeetingHours(dailyReport);
+					availableHours = availableHours - companyMeetingHours;
+					backupHours = backupHours + GetBackupHours(dailyReport);
+					SprintActivity sprintActivity = new SprintActivity
+					{
+						UserId = dailyReport.UserId,
+						ActivityDate = dailyReport.ActivityDate,
+						SprintId = sprint.SprintId,
+						AvailableHours = dailyReport.IsBackup?0.00:availableHours,
+						CompanyMeetingHours = dailyReport.IsBackup?0.00:companyMeetingHours,
+						BackupHours = dailyReport.IsBackup?backupHours:0.00,
+						OnsiteHours = 0.00,
+						OvertimeHours = 0.00,
+						HolidayOvertimeHours = 0.00
+					};
+					sprintActivities.Add(sprintActivity);
+				}
+				_context.AddRange(sprintActivities);
+				await _context.SaveChangesAsync();
+
+			}
+			else
+			{
+				ModelState.AddModelError("","Fill the data again!");
+			}
 			return RedirectToAction(nameof(ViewCurrentSprint));
 		}
 
@@ -323,6 +366,59 @@ namespace ProBilling.Controllers
 			}
 
 			ViewBag.CompanyMeeting = companyMeeting;
+		}
+
+		private double GetAvailableHours(DailyReportViewModel dailyReport)
+		{
+			double availableHours = 0.00;
+			if (dailyReport.AvailableFor == AvailableFor.FullDay)
+				availableHours = 8.5;
+			else if (dailyReport.AvailableFor == AvailableFor.HalfDay)
+				availableHours = 4.25;
+			return availableHours;
+		}
+
+		private double GetBackupHours(DailyReportViewModel dailyReport)
+		{
+			double backupHours = 0.00;
+			if (!dailyReport.IsBackup)
+			{
+				if (dailyReport.AvailableFor == AvailableFor.Leave)
+					backupHours = 8.5;
+				else if (dailyReport.AvailableFor == AvailableFor.HalfDay)
+					backupHours = 4.25;
+			}
+			else
+			{
+				if (dailyReport.AvailableFor == AvailableFor.Leave)
+					backupHours = -8.5;
+				else if (dailyReport.AvailableFor == AvailableFor.HalfDay)
+					backupHours = -4.25;
+			}
+			return backupHours;
+		}
+
+		private double GetCompanyMeetingHours(DailyReportViewModel dailyReport)
+		{
+			double companyMeetingHours = 0.00;
+			if (dailyReport.TechTalk == CompanyMeeting.Attended)
+				companyMeetingHours = companyMeetingHours + 1.00;
+			if (dailyReport.Igrow == CompanyMeeting.Attended)
+				companyMeetingHours = companyMeetingHours + 1.50;
+			if (dailyReport.BigSprintDay == CompanyMeeting.Attended)
+				companyMeetingHours = companyMeetingHours + 1.50;
+			if (dailyReport.MeetingWithCdl == CompanyMeeting.Attended)
+				companyMeetingHours = companyMeetingHours + 1.00;
+			if (dailyReport.Smf == CompanyMeeting.Attended)
+				companyMeetingHours = companyMeetingHours + 1.00;
+			if (dailyReport.WoW == CompanyMeeting.Attended)
+				companyMeetingHours = companyMeetingHours + 1.00;
+			if (dailyReport.SprintKpi == CompanyMeeting.Attended)
+				companyMeetingHours = companyMeetingHours + 1.50;
+			if (dailyReport.ScrumOfScrum == CompanyMeeting.Attended)
+				companyMeetingHours = companyMeetingHours + 0.25;
+
+			return companyMeetingHours;
 		}
 	}
 }
